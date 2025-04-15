@@ -15,7 +15,7 @@ class NewExpense(tk.Tk):
         self.resizable(False, False)
 
         ttk.Label(self, text="Data").grid(column=0, row=1)
-        date = DateEntry(self, date_pattern="dd.MM.YYYY", firstweekday="monday")
+        date = DateEntry(self, date_pattern="YYYY-MM-dd", firstweekday="monday")
         date.grid(column=1, row=1)
 
         ttk.Label(self, text="Kwota").grid(column=0, row=0)
