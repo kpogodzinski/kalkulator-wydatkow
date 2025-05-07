@@ -5,20 +5,18 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 
 from ExpCategory import ExpCategory
-from GUI.NewExpense import NewExpense
+from Expense import Expense
+from GUI.EditExpense import EditExpense
 
 MONTHS = ["", "styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec",
                 "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]
-
-def new_expense():
-    NewExpense()
 
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
 
         """ USTAWIENIA OKNA """
-        self.file = None
+        self.file = pd.read_csv("expenses.csv", sep=";", date_format="%yyyy-%MM-%dd")
         self.title("Kalkulator wydatków")
         self.geometry("700x600")
         self.resizable(width=False, height=False)
@@ -26,7 +24,7 @@ class MainWindow(tk.Tk):
         """ RAMKA Z DANYMI """
         expenses_frame = tk.LabelFrame(self, borderwidth=0)
         expenses_frame.pack(fill="both", padx=10, pady=10)
-        ttk.Label(expenses_frame, text="Lista wydatków", font="24").pack(padx=10, pady=10)
+        ttk.Label(expenses_frame, text="Lista wydatków", font="24").pack(padx=10, pady=5)
         self.reload_file()
 
         """ TABELKA Z WYDATKAMI """
@@ -44,18 +42,20 @@ class MainWindow(tk.Tk):
         self.tree.configure(yscrollcommand=scroll.set)
         self.refresh_tree()
 
-        new_exp_btn = ttk.Button(expenses_frame, text="Nowy wydatek", command=new_expense)
-        new_exp_btn.pack()
+        new_exp_btn = ttk.Button(expenses_frame, text="Nowy wydatek", command=self.new_expense)
+        new_exp_btn.pack(side="left", padx=10, pady=5)
 
+        modify_exp_btn = ttk.Button(expenses_frame, text="Edytuj wydatek", command=self.edit_expense)
+        modify_exp_btn.pack(side="left", padx=10, pady=5)
 
         """ RAMKA Z FILTRAMI """
         filters_frame = tk.LabelFrame(self, borderwidth=0)
         filters_frame.pack(fill="both", padx=10, pady=10)
-        ttk.Label(filters_frame, text="Filtry", font="24").pack()
+        ttk.Label(filters_frame, text="Filtry", font="24").pack(anchor='w', padx=10, pady=5)
 
         """ FILTR WG KATEGORII """
         cat_frame = tk.Frame(filters_frame)
-        ttk.Label(cat_frame, text="Kategoria")
+        ttk.Label(cat_frame, text="Kategoria:")
         self.category = ttk.Combobox(cat_frame, values=[cat.value for cat in ExpCategory])
 
         for child in cat_frame.winfo_children():
@@ -124,6 +124,20 @@ class MainWindow(tk.Tk):
         default_radio.invoke()
         self.mainloop()
 
+    def new_expense(self):
+        EditExpense(master=self, on_close=self.on_edit_close)
+
+    def edit_expense(self):
+        try:
+            expense = self.get_expense_from_tree()
+            EditExpense(master=self, on_close=self.on_edit_close, expense=expense)
+        except IndexError as e:
+            print(e)
+
+    def on_edit_close(self):
+        self.reload_file()
+        self.refresh_tree()
+
     def reload_file(self):
         self.file = pd.read_csv("expenses.csv", sep=";", date_format="%yyyy-%MM-%dd")
         self.file.sort_values(by=["Data"], ascending=False, inplace=True)
@@ -132,9 +146,15 @@ class MainWindow(tk.Tk):
         self.tree.delete(*self.tree.get_children())
         for _, row in self.file.iterrows():
             values = list(row)
-            values[2] = ExpCategory[values[2]]
+            values[2] = str(ExpCategory[values[2]])
             self.tree.insert("", tk.END, values=values)
         self.tree.pack(fill="both", padx=10, pady=10)
+
+    def get_expense_from_tree(self):
+        selected = self.tree.focus()
+        entry = self.tree.item(selected)["values"]
+        expense = Expense(date=entry[0], amount=entry[1], category=ExpCategory(entry[2]).name, notes=entry[3])
+        return expense
 
     def search(self, date_from=None, date_to=None, category=None, year=None, month=None, day=None):
         self.reload_file()

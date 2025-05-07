@@ -13,5 +13,4 @@ class Expense:
         self.notes = notes
 
     def __str__(self):
-        return f"{self.date};{self.amount};{self.category};{self.notes}"
-
+        return f"{self.date};{float(self.amount):.2f};{self.category};{self.notes}\n"
