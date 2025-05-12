@@ -1,11 +1,13 @@
 import calendar
 import tkinter as tk
+from typing import Optional
+
 import pandas as pd
 from tkinter import ttk
 from tkcalendar import DateEntry
 
 from ExpCategory import ExpCategory
-from Expense import Expense
+from Models.Expense import Expense
 from GUI.EditExpense import EditExpense
 
 MONTHS = ["", "styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec",
@@ -22,6 +24,8 @@ class MainWindow(tk.Tk):
         self.resizable(width=False, height=False)
 
         """ RAMKA Z DANYMI """
+        self.sort_state: dict[Optional[str], Optional[str]] \
+            = {"column": None, "direction": None}
         expenses_frame = tk.LabelFrame(self, borderwidth=0)
         expenses_frame.pack(fill="both", padx=10, pady=10)
         ttk.Label(expenses_frame, text="Lista wydatków", font="24").pack(padx=10, pady=5)
@@ -34,14 +38,16 @@ class MainWindow(tk.Tk):
         widths = (100, 100, 150, 250)
 
         for col, width in zip(self.file.columns, widths):
-            self.tree.heading(col, text=col)
+            self.tree.heading(col, text=col, command=lambda _col=col: self.sort_by_column(_col))
             self.tree.column(col, width=width)
 
+        """ SCROLLBAR DO TABELKI """
         scroll = ttk.Scrollbar(expenses_frame, orient="vertical", command=self.tree.yview)
         scroll.pack(side="right", fill="y")
         self.tree.configure(yscrollcommand=scroll.set)
         self.refresh_tree()
 
+        """ PRZYCISKI DO TWORZENIA/EDYCJI WYDATKU """
         new_exp_btn = ttk.Button(expenses_frame, text="Nowy wydatek", command=self.new_expense)
         new_exp_btn.pack(side="left", padx=10, pady=5)
 
@@ -140,8 +146,12 @@ class MainWindow(tk.Tk):
 
     def reload_file(self):
         self.file = pd.read_csv("expenses.csv", sep=";", date_format="%yyyy-%MM-%dd")
-        self.file.sort_values(by=["Data"], ascending=False, inplace=True)
-    
+        if self.sort_state["column"] and self.sort_state["direction"]:
+            ascending = self.sort_state["direction"] == "asc"
+            self.file.sort_values(by=self.sort_state["column"], ascending=ascending, inplace=True)
+        else:
+            self.file.sort_values(by=["Data"], ascending=False, inplace=True)
+
     def refresh_tree(self):
         self.tree.delete(*self.tree.get_children())
         for _, row in self.file.iterrows():
@@ -149,6 +159,36 @@ class MainWindow(tk.Tk):
             values[2] = str(ExpCategory[values[2]])
             self.tree.insert("", tk.END, values=values)
         self.tree.pack(fill="both", padx=10, pady=10)
+
+    def sort_by_column(self, col):
+        current = self.sort_state
+
+        if current["column"] == col:
+            if current["direction"] is None:
+                current["direction"] = "asc"
+            elif current["direction"] == "asc":
+                current["direction"] = "desc"
+            else:
+                current["direction"] = None
+                current["column"] = None
+        else:
+            current["column"] = col
+            current["direction"] = "asc"
+
+        if current["direction"] is None:
+            self.reload_file()  # Przywróć domyślną kolejność z pliku
+        else:
+            ascending = current["direction"] == "asc"
+            self.file.sort_values(by=col, ascending=ascending, inplace=True)
+
+        self.refresh_tree()
+
+        for heading in self.tree["columns"]:
+            label = heading
+            if heading == current["column"]:
+                arrow = {"asc": "▲", "desc": "▼"}.get(current["direction"], "")
+                label += f" {arrow}"
+            self.tree.heading(heading, text=label, command=lambda _col=heading: self.sort_by_column(_col))
 
     def get_expense_from_tree(self):
         selected = self.tree.focus()

@@ -4,7 +4,7 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 
 from ExpCategory import ExpCategory
-from Expense import Expense
+from Models.Expense import Expense
 
 
 class EditExpense(tk.Toplevel):
