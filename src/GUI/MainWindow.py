@@ -4,6 +4,7 @@ from typing import Optional
 
 import pandas as pd
 from tkinter import ttk
+from tkinter import messagebox as mb
 from tkcalendar import DateEntry
 
 from ExpCategory import ExpCategory
@@ -53,6 +54,9 @@ class MainWindow(tk.Tk):
 
         modify_exp_btn = ttk.Button(expenses_frame, text="Edytuj wydatek", command=self.edit_expense)
         modify_exp_btn.pack(side="left", padx=10, pady=5)
+
+        delete_exp_btn = ttk.Button(expenses_frame, text="Usuń wydatek", command=self.delete_expense)
+        delete_exp_btn.pack(side="left", padx=10, pady=5)
 
         """ RAMKA Z FILTRAMI """
         filters_frame = tk.LabelFrame(self, borderwidth=0)
@@ -139,6 +143,22 @@ class MainWindow(tk.Tk):
             EditExpense(master=self, on_close=self.on_edit_close, expense=expense)
         except IndexError as e:
             print(e)
+
+    def delete_expense(self):
+        confirmed = mb.askquestion(title="Potwierdzenie", message="Czy na pewno chcesz usunąć wskazany wydatek?")
+        if confirmed == "no":
+            return
+
+        expense = self.get_expense_from_tree()
+        with open("expenses.csv", "r") as file:
+            lines = file.readlines()
+
+        with open("expenses.csv", "w") as file:
+            for line in lines:
+                if line != str(expense):
+                    file.write(line)
+
+        self.on_edit_close()
 
     def on_edit_close(self):
         self.reload_file()
