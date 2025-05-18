@@ -20,7 +20,8 @@ class MainWindow(tk.Tk):
         super().__init__()
 
         """ USTAWIENIA OKNA """
-        self.file = pd.read_csv("expenses.csv", sep=";", date_format="%yyyy-%MM-%dd")
+        self.file = pd.read_csv("expenses.csv", sep=";")
+        self.file["Data"] = pd.to_datetime(self.file["Data"])
         self.title("Kalkulator wydatków")
         self.geometry("700x600")
         self.resizable(width=False, height=False)
@@ -173,7 +174,8 @@ class MainWindow(tk.Tk):
 
     def reload_file(self):
         self.file = pd.read_csv("expenses.csv", sep=";")
-        self.file["Data"] = pd.to_datetime(self.file["Data"]).dt.date
+        self.file["Data"] = pd.to_datetime(self.file["Data"])
+
         if self.sort_state["column"] and self.sort_state["direction"]:
             ascending = self.sort_state["direction"] == "asc"
             self.file.sort_values(by=self.sort_state["column"], ascending=ascending, inplace=True)
@@ -184,6 +186,7 @@ class MainWindow(tk.Tk):
         self.tree.delete(*self.tree.get_children())
         for _, row in self.file.iterrows():
             values = list(row)
+            values[0] = values[0].strftime("%Y-%m-%d")
             values[2] = str(ExpCategory[values[2]])
             self.tree.insert("", tk.END, values=values)
         self.tree.pack(fill="both", padx=10, pady=10)
@@ -204,7 +207,7 @@ class MainWindow(tk.Tk):
             current["direction"] = "asc"
 
         if current["direction"] is None:
-            self.reload_file()  # Przywróć domyślną kolejność z pliku
+            self.reload_file()
         else:
             ascending = current["direction"] == "asc"
             self.file.sort_values(by=col, ascending=ascending, inplace=True)
@@ -233,17 +236,20 @@ class MainWindow(tk.Tk):
                 month = str(m) if m > 9 else f"0{m}"
                 if day != "":
                     day = day if int(day) > 9 else f"0{day}"
-                    self.file = self.file[self.file.Data == f"{year}-{month}-{day}"]
+                    self.file = self.file[(self.file["Data"].dt.year == int(year)) &
+                                          (self.file["Data"].dt.month == int(month)) &
+                                          (self.file["Data"].dt.day == int(day))]
                 else:
-                    self.file = self.file[self.file.Data.str[:-3] == f"{year}-{month}"]
+                    self.file = self.file[(self.file["Data"].dt.year == int(year)) &
+                                          (self.file["Data"].dt.month == int(month))]
             else:
-                self.file = self.file[self.file.Data.str[:4] == f"{year}"]
+                self.file = self.file[self.file["Data"].dt.year == int(year)]
 
         if date_from != "" and date_to != "":
-            self.file = self.file[(self.file.Data >= date_from) & (self.file.Data <= date_to)]
+            self.file = self.file[(self.file["Data"] >= date_from) & (self.file["Data"] <= date_to)]
 
         if category != "":
-            self.file = self.file[self.file.Kategoria == ExpCategory(category).name]
+            self.file = self.file[self.file["Kategoria"] == ExpCategory(category).name]
         self.refresh_tree()
 
     def clear_day(self):

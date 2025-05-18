@@ -24,7 +24,7 @@ class StatsWindow(tk.Toplevel):
 
         """ ODCZYT PLIKU """
         file = pd.read_csv("expenses.csv", sep=";")
-        file["Data"] = pd.to_datetime(file["Data"]).dt.date
+        file["Data"] = pd.to_datetime(file["Data"])
 
         """ OBLICZENIE STATYSTYK """
         expenses_count = file["Kwota"].count()
