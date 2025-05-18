@@ -7,7 +7,7 @@ from ExpCategory import ExpCategory
 from Models.Expense import Expense
 
 
-class EditExpense(tk.Toplevel):
+class EditExpenseWindow(tk.Toplevel):
     def __init__(self, master=None, on_close=None, expense=None):
         super().__init__(master)
         self.expense = expense

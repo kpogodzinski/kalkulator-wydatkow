@@ -1,15 +1,16 @@
 import calendar
 import tkinter as tk
-from typing import Optional
-
 import pandas as pd
+
+from typing import Optional
 from tkinter import ttk
 from tkinter import messagebox as mb
 from tkcalendar import DateEntry
 
-from ExpCategory import ExpCategory
 from Models.Expense import Expense
-from GUI.EditExpense import EditExpense
+from ExpCategory import ExpCategory
+from GUI.EditExpenseWindow import EditExpenseWindow
+from GUI.StatsWindow import StatsWindow
 
 MONTHS = ["", "styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec",
                 "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]
@@ -57,6 +58,9 @@ class MainWindow(tk.Tk):
 
         delete_exp_btn = ttk.Button(expenses_frame, text="Usuń wydatek", command=self.delete_expense)
         delete_exp_btn.pack(side="left", padx=10, pady=5)
+
+        stats_btn = ttk.Button(expenses_frame, text="Statystyki", command=self.open_stats)
+        stats_btn.pack(side="right", padx=10, pady=5)
 
         """ RAMKA Z FILTRAMI """
         filters_frame = tk.LabelFrame(self, borderwidth=0)
@@ -135,12 +139,12 @@ class MainWindow(tk.Tk):
         self.mainloop()
 
     def new_expense(self):
-        EditExpense(master=self, on_close=self.on_edit_close)
+        EditExpenseWindow(master=self, on_close=self.on_edit_close)
 
     def edit_expense(self):
         try:
             expense = self.get_expense_from_tree()
-            EditExpense(master=self, on_close=self.on_edit_close, expense=expense)
+            EditExpenseWindow(master=self, on_close=self.on_edit_close, expense=expense)
         except IndexError as e:
             print(e)
 
@@ -160,12 +164,16 @@ class MainWindow(tk.Tk):
 
         self.on_edit_close()
 
+    def open_stats(self):
+        StatsWindow(master=self)
+
     def on_edit_close(self):
         self.reload_file()
         self.refresh_tree()
 
     def reload_file(self):
-        self.file = pd.read_csv("expenses.csv", sep=";", date_format="%yyyy-%MM-%dd")
+        self.file = pd.read_csv("expenses.csv", sep=";")
+        self.file["Data"] = pd.to_datetime(self.file["Data"]).dt.date
         if self.sort_state["column"] and self.sort_state["direction"]:
             ascending = self.sort_state["direction"] == "asc"
             self.file.sort_values(by=self.sort_state["column"], ascending=ascending, inplace=True)
