@@ -1,51 +1,201 @@
 Data;Kwota;Kategoria;Opis
-2024-11-04;425.38;HOUSING;Sample expense in housing
-2024-11-28;177.98;TRANSPORT;Sample expense in transport
-2025-03-19;92.8;HOUSING;Sample expense in housing
-2025-02-11;18.43;HOUSING;Sample expense in housing
-2024-12-24;284.56;FOOD;Sample expense in food
-2024-12-04;231.39;FOOD;Sample expense in food
-2025-04-13;499.83;HOUSING;Sample expense in housing
-2024-10-21;42.91;SHOPPING;Sample expense in shopping
-2025-03-20;346.21;SHOPPING;Sample expense in shopping
-2025-01-10;484.71;ENTERTAINMENT;Sample expense in entertainment
-2025-04-07;426.79;EDUCATION;Sample expense in education
-2025-03-19;348.93;SHOPPING;Sample expense in shopping
-2025-03-28;87.85;TRANSPORT;Sample expense in transport
-2024-11-13;70.39;HEALTH;Sample expense in health
-2024-12-01;401.89;OTHER;Sample expense in other
-2024-10-28;84.96;EDUCATION;Sample expense in education
-2024-12-27;327.15;HOUSING;Sample expense in housing
-2025-01-06;32.7;EDUCATION;Sample expense in education
-2025-04-06;193.27;EDUCATION;Sample expense in education
-2025-01-23;233.05;HOUSING;Sample expense in housing
-2024-12-15;359.15;HOUSING;Sample expense in housing
-2025-04-05;448.82;FOOD;Sample expense in food
-2025-02-16;267.8;EDUCATION;Sample expense in education
-2024-12-28;67.78;EDUCATION;Sample expense in education
-2025-02-19;87.7;EDUCATION;Sample expense in education
-2025-04-14;271.85;EDUCATION;Sample expense in education
-2025-01-28;318.95;HEALTH;Sample expense in health
-2025-01-06;365.2;EDUCATION;Sample expense in education
-2024-12-11;363.05;HEALTH;Sample expense in health
-2025-01-29;162.85;OTHER;Sample expense in other
-2025-01-12;176.13;FOOD;Sample expense in food
-2025-03-04;481.06;HEALTH;Sample expense in health
-2025-03-06;334.15;OTHER;Sample expense in other
-2025-01-26;289.94;HOUSING;Sample expense in housing
-2024-10-20;402.43;TRANSPORT;Sample expense in transport
-2024-10-17;242.83;ENTERTAINMENT;Sample expense in entertainment
-2025-03-11;395.48;OTHER;Sample expense in other
-2024-11-08;11.11;TRANSPORT;Sample expense in transport
-2025-03-12;337.96;SHOPPING;Sample expense in shopping
-2024-11-18;355.02;HOUSING;Sample expense in housing
-2025-03-27;182.59;EDUCATION;Sample expense in education
-2024-11-03;373.86;EDUCATION;Sample expense in education
-2024-11-03;264.36;TRANSPORT;Sample expense in transport
-2024-12-02;303.63;EDUCATION;Sample expense in education
-2025-01-23;67.03;ENTERTAINMENT;Sample expense in entertainment
-2024-12-04;286.05;ENTERTAINMENT;Sample expense in entertainment
-2024-11-21;395.42;FOOD;Sample expense in food
-2025-03-25;222.35;SHOPPING;Sample expense in shopping
-2025-02-19;22.74;ENTERTAINMENT;Sample expense in entertainment
-2024-12-24;433.12;SHOPPING;Sample expense in shopping
+2023-07-18;137.55;ENTERTAINMENT;Bilet do kina
+2025-01-21;61.73;FOOD;Zakupy spożywcze
+2022-03-03;64.97;SHOPPING;Nowe ubrania
+2025-02-23;115.44;HOUSING;Czynsz
+2024-07-08;302.85;SHOPPING;Sprzęt AGD
+2024-05-15;183.32;EDUCATION;Zakup podręczników
+2023-11-21;69.06;FOOD;Kolacja w restauracji
+2024-01-06;426.8;SHOPPING;Nowe ubrania
+2024-07-29;277.39;HEALTH;Wizyta u dentysty
+2025-02-04;160.73;SHOPPING;Nowe ubrania
+2022-05-23;42.0;OTHER;Zakup książki
+2022-06-13;430.55;HOUSING;Rachunek za wodę
+2023-07-24;237.64;ENTERTAINMENT;Gra komputerowa
+2024-01-29;190.53;OTHER;Zakup książki
+2022-12-17;276.39;HEALTH;Wizyta u dentysty
+2024-08-04;202.14;HOUSING;Rachunek za prąd
+2022-04-25;129.94;HOUSING;Rachunek za wodę
+2024-04-01;148.52;EDUCATION;Czesne za szkołę
+2023-03-12;334.61;HOUSING;Rachunek za wodę
+2022-10-20;147.14;SHOPPING;Torba
+2025-04-12;225.65;HOUSING;Rachunek za wodę
+2023-03-26;498.72;SHOPPING;Buty
+2022-07-06;382.78;FOOD;Kawa na wynos
+2022-11-24;400.2;ENTERTAINMENT;Subskrypcja Netflix
+2024-02-28;203.18;SHOPPING;Nowe ubrania
+2025-02-07;433.17;TRANSPORT;Taksówka
+2025-01-04;380.42;EDUCATION;Opłata za kurs online
+2023-08-25;228.69;OTHER;Prezent urodzinowy
+2023-06-24;486.51;TRANSPORT;Paliwo
+2023-09-04;424.0;FOOD;Zakupy spożywcze
+2024-02-05;386.01;HOUSING;Rachunek za prąd
+2024-09-27;29.35;EDUCATION;Czesne za szkołę
+2023-05-06;47.8;OTHER;Artykuły papiernicze
+2024-09-22;411.69;ENTERTAINMENT;Bilet do kina
+2024-08-31;474.49;FOOD;Kolacja w restauracji
+2024-12-16;438.77;FOOD;Lunch na mieście
+2025-01-09;382.53;SHOPPING;Sprzęt AGD
+2024-03-28;497.67;HOUSING;Rachunek za wodę
+2024-11-25;236.71;OTHER;Darowizna
+2022-05-12;182.28;HOUSING;Rachunek za prąd
+2022-01-15;54.08;HOUSING;Rachunek za prąd
+2022-05-19;454.6;EDUCATION;Zakup podręczników
+2024-11-18;134.24;OTHER;Prezent urodzinowy
+2025-01-09;83.51;TRANSPORT;Bilet miesięczny
+2024-08-26;407.6;TRANSPORT;Bilet miesięczny
+2022-07-18;336.31;HOUSING;Czynsz
+2024-04-21;244.17;OTHER;Darowizna
+2022-05-05;213.26;EDUCATION;Opłata za kurs online
+2023-05-25;111.96;OTHER;Prezent urodzinowy
+2024-05-14;108.07;TRANSPORT;Bilet miesięczny
+2022-06-04;232.7;TRANSPORT;Bilet miesięczny
+2025-01-12;421.29;ENTERTAINMENT;Bilet do kina
+2022-12-07;215.08;ENTERTAINMENT;Subskrypcja Netflix
+2024-04-01;453.17;TRANSPORT;Bilet miesięczny
+2022-01-05;492.95;FOOD;Kawa na wynos
+2023-08-08;223.04;HEALTH;Badania krwi
+2023-01-24;162.42;TRANSPORT;Bilet miesięczny
+2023-10-05;47.44;EDUCATION;Opłata za kurs online
+2022-04-27;481.17;TRANSPORT;Bilet miesięczny
+2022-05-21;305.62;ENTERTAINMENT;Subskrypcja Netflix
+2022-09-03;471.97;HOUSING;Internet domowy
+2022-06-17;221.23;HOUSING;Czynsz
+2023-02-23;341.47;OTHER;Artykuły papiernicze
+2023-06-28;209.98;OTHER;Zakup książki
+2023-10-10;465.93;HEALTH;Badania krwi
+2024-07-27;318.16;ENTERTAINMENT;Bilet do kina
+2025-01-06;122.31;ENTERTAINMENT;Bilet do kina
+2023-12-16;442.81;HEALTH;Lekarstwa
+2023-08-07;95.72;HOUSING;Rachunek za wodę
+2025-02-09;163.7;HEALTH;Wizyta u dentysty
+2023-06-26;75.41;ENTERTAINMENT;Subskrypcja Netflix
+2023-07-12;155.24;ENTERTAINMENT;Subskrypcja Netflix
+2023-02-21;350.0;HOUSING;Rachunek za wodę
+2023-05-30;454.56;HEALTH;Badania krwi
+2024-05-17;418.09;EDUCATION;Opłata za kurs online
+2023-11-15;390.14;EDUCATION;Opłata za kurs online
+2024-06-23;284.81;HEALTH;Lekarstwa
+2022-08-18;56.12;SHOPPING;Nowe ubrania
+2024-01-27;299.6;FOOD;Zakupy spożywcze
+2022-09-19;40.08;FOOD;Kawa na wynos
+2024-01-03;120.84;OTHER;Prezent urodzinowy
+2023-12-26;394.46;HOUSING;Czynsz
+2023-04-30;435.01;SHOPPING;Sprzęt AGD
+2022-02-20;106.09;FOOD;Kawa na wynos
+2023-05-24;148.07;OTHER;Darowizna
+2022-03-21;432.12;ENTERTAINMENT;Gra komputerowa
+2024-07-31;187.84;HOUSING;Rachunek za prąd
+2022-02-18;336.82;HOUSING;Rachunek za prąd
+2023-07-25;434.89;SHOPPING;Buty
+2024-11-09;211.85;HEALTH;Ubezpieczenie zdrowotne
+2022-08-25;440.98;OTHER;Prezent urodzinowy
+2025-04-04;482.02;HEALTH;Lekarstwa
+2022-08-11;306.35;HEALTH;Wizyta u dentysty
+2024-06-12;310.98;OTHER;Artykuły papiernicze
+2025-03-26;111.24;ENTERTAINMENT;Gra komputerowa
+2022-01-04;269.56;EDUCATION;Szkolenie zawodowe
+2024-06-02;53.59;HOUSING;Rachunek za wodę
+2022-09-13;365.48;OTHER;Artykuły papiernicze
+2024-04-16;176.57;HEALTH;Ubezpieczenie zdrowotne
+2023-01-28;221.81;HEALTH;Lekarstwa
+2025-03-11;164.46;SHOPPING;Sprzęt AGD
+2023-08-11;120.89;EDUCATION;Czesne za szkołę
+2024-06-23;232.24;OTHER;Darowizna
+2022-12-14;336.25;HOUSING;Internet domowy
+2022-07-11;412.84;HEALTH;Ubezpieczenie zdrowotne
+2023-04-06;407.15;HOUSING;Rachunek za wodę
+2022-04-05;137.52;FOOD;Zakupy spożywcze
+2024-07-21;218.93;TRANSPORT;Paliwo
+2024-10-09;211.83;HOUSING;Internet domowy
+2022-08-07;393.64;FOOD;Zakupy spożywcze
+2024-11-26;242.98;HOUSING;Rachunek za prąd
+2024-07-23;84.0;HOUSING;Czynsz
+2024-06-25;314.07;TRANSPORT;Taksówka
+2022-11-22;376.95;SHOPPING;Torba
+2023-06-15;380.85;TRANSPORT;Serwis roweru
+2023-05-05;151.81;HEALTH;Badania krwi
+2023-04-26;150.42;ENTERTAINMENT;Wyjście na koncert
+2022-10-11;92.4;OTHER;Prezent urodzinowy
+2023-03-15;50.83;SHOPPING;Sprzęt AGD
+2025-01-16;243.64;SHOPPING;Buty
+2024-05-10;206.95;EDUCATION;Zakup podręczników
+2024-09-03;22.83;EDUCATION;Szkolenie zawodowe
+2024-03-09;429.66;OTHER;Artykuły papiernicze
+2024-09-26;125.32;SHOPPING;Sprzęt AGD
+2022-03-01;206.65;SHOPPING;Torba
+2024-08-15;461.38;SHOPPING;Sprzęt AGD
+2025-04-27;290.91;EDUCATION;Szkolenie zawodowe
+2024-05-27;85.14;EDUCATION;Opłata za kurs online
+2022-04-13;144.88;TRANSPORT;Bilet miesięczny
+2024-07-20;176.89;OTHER;Zakup książki
+2024-05-13;141.09;SHOPPING;Buty
+2022-02-09;379.53;ENTERTAINMENT;Gra komputerowa
+2023-04-05;332.07;EDUCATION;Czesne za szkołę
+2023-05-22;115.69;EDUCATION;Opłata za kurs online
+2023-05-04;80.59;EDUCATION;Zakup podręczników
+2024-08-10;355.74;ENTERTAINMENT;Subskrypcja Netflix
+2022-08-23;393.34;OTHER;Zakup książki
+2022-08-10;297.77;FOOD;Lunch na mieście
+2024-03-23;471.91;HEALTH;Badania krwi
+2025-04-27;351.49;HOUSING;Czynsz
+2023-09-10;428.14;HOUSING;Czynsz
+2023-12-13;275.72;ENTERTAINMENT;Bilet do kina
+2024-11-02;330.82;OTHER;Prezent urodzinowy
+2024-09-30;70.66;EDUCATION;Szkolenie zawodowe
+2022-11-10;229.03;OTHER;Darowizna
+2024-08-10;229.08;HEALTH;Badania krwi
+2023-05-18;418.75;HEALTH;Ubezpieczenie zdrowotne
+2024-07-12;137.05;ENTERTAINMENT;Wyjście na koncert
+2023-11-20;33.78;TRANSPORT;Serwis roweru
+2024-09-25;121.82;OTHER;Zakup książki
+2023-07-27;442.55;HEALTH;Ubezpieczenie zdrowotne
+2024-11-24;475.07;HEALTH;Wizyta u dentysty
+2024-04-12;254.52;ENTERTAINMENT;Subskrypcja Netflix
+2024-10-02;235.12;HOUSING;Internet domowy
+2023-08-26;126.37;EDUCATION;Opłata za kurs online
+2025-04-06;197.13;HOUSING;Rachunek za wodę
+2025-02-01;178.78;OTHER;Darowizna
+2023-09-20;140.67;TRANSPORT;Taksówka
+2023-10-09;77.39;ENTERTAINMENT;Subskrypcja Netflix
+2023-03-20;374.53;FOOD;Kolacja w restauracji
+2022-07-25;419.66;HEALTH;Ubezpieczenie zdrowotne
+2024-01-10;106.13;HEALTH;Lekarstwa
+2023-07-16;41.85;EDUCATION;Zakup podręczników
+2022-09-16;326.18;EDUCATION;Czesne za szkołę
+2022-01-26;295.55;TRANSPORT;Paliwo
+2024-06-21;183.54;TRANSPORT;Serwis roweru
+2024-09-05;74.76;EDUCATION;Czesne za szkołę
+2024-10-04;55.56;ENTERTAINMENT;Gra komputerowa
+2022-11-02;409.35;EDUCATION;Zakup podręczników
+2023-05-24;76.86;HEALTH;Wizyta u dentysty
+2024-12-06;202.58;SHOPPING;Sprzęt AGD
+2025-04-20;495.22;TRANSPORT;Taksówka
+2022-07-23;474.84;HEALTH;Wizyta u dentysty
+2023-06-26;337.01;HOUSING;Rachunek za prąd
+2022-12-22;284.96;FOOD;Kolacja w restauracji
+2024-04-16;236.24;FOOD;Zakupy spożywcze
+2022-03-08;131.11;TRANSPORT;Taksówka
+2022-05-26;349.94;HEALTH;Badania krwi
+2024-05-20;75.09;HEALTH;Lekarstwa
+2023-06-29;416.78;HOUSING;Rachunek za prąd
+2022-12-06;400.46;ENTERTAINMENT;Bilet do kina
+2022-09-12;244.98;HEALTH;Badania krwi
+2023-07-12;260.23;HEALTH;Badania krwi
+2022-06-14;307.06;TRANSPORT;Serwis roweru
+2023-05-28;32.42;SHOPPING;Buty
+2023-07-06;296.6;HOUSING;Czynsz
+2024-11-28;332.72;FOOD;Kawa na wynos
+2025-04-13;229.22;HEALTH;Lekarstwa
+2024-08-20;187.02;TRANSPORT;Paliwo
+2022-08-03;431.71;OTHER;Artykuły papiernicze
+2024-10-11;158.34;OTHER;Darowizna
+2024-07-20;62.27;SHOPPING;Nowe ubrania
+2022-08-26;485.69;HEALTH;Ubezpieczenie zdrowotne
+2025-01-16;241.75;SHOPPING;Nowe ubrania
+2024-11-27;193.65;EDUCATION;Zakup podręczników
+2022-04-16;117.71;TRANSPORT;Serwis roweru
+2024-06-16;442.81;FOOD;Lunch na mieście
+2022-03-01;487.11;TRANSPORT;Paliwo
+2023-09-29;284.4;HOUSING;Rachunek za prąd
+2023-04-06;496.28;SHOPPING;Nowe ubrania

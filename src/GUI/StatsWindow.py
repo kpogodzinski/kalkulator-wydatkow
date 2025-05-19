@@ -1,6 +1,10 @@
+import tkinter
 import tkinter as tk
+from datetime import datetime
 from tkinter import ttk
 from collections import Counter
+
+from tkcalendar import DateEntry
 
 import pandas as pd
 import seaborn as sns
@@ -15,64 +19,127 @@ class StatsWindow(tk.Toplevel):
         super().__init__(master)
 
         self.title("Statystyki")
-        self.geometry("800x500")
+        self.geometry("1000x600")
         self.resizable(False, False)
 
         """ RAMKA ZE STATYSTYKAMI """
-        stats_frame = tk.LabelFrame(self, text="Statystyki opisowe", borderwidth=1)
-        stats_frame.pack(side="left", fill="y", padx=10, pady=10)
+        self.stats_frame = tk.LabelFrame(self, text="Statystyki opisowe", borderwidth=1)
+        self.stats_frame.pack(side="left", fill="y", padx=10, pady=10)
 
         """ ODCZYT PLIKU """
-        file = pd.read_csv("expenses.csv", sep=";")
-        file["Data"] = pd.to_datetime(file["Data"])
+        self.file = pd.read_csv("expenses.csv", sep=";")
+        self.file["Data"] = pd.to_datetime(self.file["Data"])
 
         """ OBLICZENIE STATYSTYK """
-        expenses_count = file["Kwota"].count()
-        expenses_sum = file["Kwota"].sum()
-
-        days = (file["Data"].max() - file["Data"].min()).days + 1
-        daily_avg = round(expenses_sum / days, 2)
-
-        expense_max = max(file["Kwota"])
-        cat_counter = Counter(file["Kategoria"])
-        most_common_cat = max(cat_counter, key=cat_counter.get)
+        self.stats = self.compute_stats()
+        most_common_cat = max(self.stats["cat_counter"], key=self.stats["cat_counter"].get)
 
         """ ETYKIETY ZE STATYSTYKAMI """
-        ttk.Label(stats_frame, text=f"Liczba wydatków: {expenses_count}")
-        ttk.Label(stats_frame, text=f"Suma wydatków: {expenses_sum}")
-        ttk.Label(stats_frame, text=f"Średnia dzienna: {daily_avg}")
-        ttk.Label(stats_frame, text=f"Największy wydatek: {expense_max}")
-        ttk.Label(stats_frame, text=f"Najczęstsza kategoria: {ExpCategory[most_common_cat]}")
+        ttk.Label(self.stats_frame, text=f"Liczba wydatków: {self.stats["expenses_count"]}")
+        ttk.Label(self.stats_frame, text=f"Suma wydatków: {self.stats["expenses_sum"]}")
+        ttk.Label(self.stats_frame, text=f"Średnia dzienna: {self.stats["daily_avg"]}")
+        ttk.Label(self.stats_frame, text=f"Największy wydatek: {self.stats["expense_max"]}")
+        ttk.Label(self.stats_frame, text=f"Najczęstsza kategoria: {ExpCategory[most_common_cat]}")
 
-        for child in stats_frame.winfo_children():
-            child["font"] = tk.font.Font(size=10)
-            child.pack(anchor="w", padx=5, pady=5)
+        for child in self.stats_frame.winfo_children():
+            child["font"] = tk.font.Font(size=12)
+            child.pack(anchor="w", padx=10, pady=10)
 
         """ RAMKA Z WYKRESAMI """
-        charts_frame = tk.LabelFrame(self, text="Wykresy", borderwidth=1)
-        charts_frame.pack(side="right", fill="both", expand=1, padx=10, pady=10)
+        self.charts_frame = tk.LabelFrame(self, text="Wykresy", borderwidth=1)
+        self.charts_frame.pack(side="right", fill="both", expand=True, padx=10, pady=10)
 
         """ ZAKŁADKI DLA WYKRESÓW """
-        tabs_widget = ttk.Notebook(charts_frame)
-        piechart_tab = ttk.Frame(tabs_widget)
+        self.tabs_widget = ttk.Notebook(self.charts_frame)
 
-        tabs_widget.add(piechart_tab, text="Rozkład kategorii")
-        tabs_widget.pack(fill="both", padx=5, pady=5)
+        self.piechart_tab = ttk.Frame(self.tabs_widget)
+        self.tabs_widget.add(self.piechart_tab, text="Rozkład kategorii")
+
+        self.barplot_tab = ttk.Frame(self.tabs_widget)
+        self.date_select_frame = ttk.Frame(self.barplot_tab)
+        self.tabs_widget.add(self.barplot_tab, text="Wydatki z okresu")
+
+        self.tabs_widget.pack(fill="both", padx=5, pady=5)
 
         """ WYKRES KOŁOWY """
-        fig = Figure(figsize=(5, 5))
-        ax = fig.add_subplot(1, 1, 1)
-        ax.pie(cat_counter.values(),
-               labels=[str(ExpCategory[label]) for label in cat_counter.keys()],
-               autopct="%1.1f%%",
-               textprops={"size": "small"},
-               shadow=True
-        )
-        ax.set_title("Rozkład kategorii")
-        ax.axis="equal"
+        self.draw_piechart()
 
-        canvas = FigureCanvasTkAgg(fig, master=piechart_tab)
+        """ WYBÓR ZAKRESU DAT DO WYKRESU SŁUPKOWEGO """
+        ttk.Label(self.date_select_frame, text="Data od:")
+        self.date_from = DateEntry(self.date_select_frame, date_pattern="YYYY-MM-dd", firstweekday="monday")
+        self.date_from.set_date(datetime.today() - pd.DateOffset(months=2))
+        self.date_from.bind("<<DateEntrySelected>>", self.on_date_change)
+
+        ttk.Label(self.date_select_frame, text="Data do:")
+        self.date_to = DateEntry(self.date_select_frame, date_pattern="YYYY-MM-dd", firstweekday="monday")
+        self.date_to.set_date(datetime.today())
+        self.date_to.bind("<<DateEntrySelected>>", self.on_date_change)
+
+        for child in self.date_select_frame.winfo_children():
+            child.pack(side="left", padx=5, pady=5)
+
+        """ WYKRES SŁUPKOWY """
+        self.date_select_frame.pack()
+        self.draw_barplot()
+
+    def compute_stats(self):
+        stats = {"expenses_count": self.file["Kwota"].count(),
+                 "expenses_sum": round(self.file["Kwota"].sum(), 2)}
+
+        days = (self.file["Data"].max() - self.file["Data"].min()).days + 1
+        stats["daily_avg"] = round(stats["expenses_sum"] / days, 2)
+
+        stats["expense_max"] = max(self.file["Kwota"])
+        stats["cat_counter"] = Counter(self.file["Kategoria"])
+
+        return stats
+
+    def draw_piechart(self):
+        fig = Figure(figsize=(6, 6))
+        ax = fig.add_subplot(1, 1, 1)
+        ax.pie(self.stats["cat_counter"].values(),
+               labels=[str(ExpCategory[label]) for label in self.stats["cat_counter"].keys()],
+               autopct="%1.1f%%",
+               shadow=True
+               )
+        ax.set_title("Rozkład kategorii")
+        ax.axis("equal")
+
+        fig.tight_layout()
+        canvas = FigureCanvasTkAgg(fig, master=self.piechart_tab)
         canvas.draw()
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
+    def draw_barplot(self):
+        filtered_data = self.file[(self.file["Data"] >= self.date_from.get()) &
+                                  (self.file["Data"] <= self.date_to.get())].copy()
+        filtered_data = filtered_data.groupby(["Data", "Kategoria"])["Kwota"].sum().reset_index()
+        filtered_data["Kategoria"] = filtered_data["Kategoria"].map(lambda cat: str(ExpCategory[cat]))
 
+        fig = Figure(figsize=(6, 5))
+        ax = fig.add_subplot(1, 1, 1)
+
+        category_order = [
+            "Edukacja", "Transport", "Zdrowie i uroda", "Codzienne zakupy",
+            "Inne wydatki", "Kultura i rozrywka", "Jedzenie poza domem", "Opłaty mieszkaniowe"
+        ]
+
+        sns.barplot(filtered_data, x="Data", y="Kwota", hue="Kategoria", hue_order=category_order, ax=ax)
+        ax.set_title("Wydatki z okresu")
+        ax.set_xlabel("Data")
+        ax.set_ylabel("Kwota")
+        ax.legend(borderaxespad=1, fontsize=8)
+        ax.tick_params(axis="x", rotation=90)
+        ax.grid(True, which="major", axis="both", linestyle="--", alpha=0.7)
+
+        fig.tight_layout()
+        canvas = FigureCanvasTkAgg(fig, master=self.barplot_tab)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
+
+    def on_date_change(self, event):
+        for child in self.barplot_tab.winfo_children():
+            if isinstance(child, tkinter.Canvas):
+                child.destroy()
+                break
+        self.draw_barplot()
