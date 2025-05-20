@@ -113,23 +113,17 @@ class StatsWindow(tk.Toplevel):
     def draw_barplot(self):
         filtered_data = self.file[(self.file["Data"] >= self.date_from.get()) &
                                   (self.file["Data"] <= self.date_to.get())].copy()
-        filtered_data = filtered_data.groupby(["Data", "Kategoria"])["Kwota"].sum().reset_index()
-        filtered_data["Kategoria"] = filtered_data["Kategoria"].map(lambda cat: str(ExpCategory[cat]))
+        filtered_data = filtered_data.groupby(["Data"])["Kwota"].sum().reset_index()
 
         fig = Figure(figsize=(6, 5))
         ax = fig.add_subplot(1, 1, 1)
 
-        category_order = [
-            "Edukacja", "Transport", "Zdrowie i uroda", "Codzienne zakupy",
-            "Inne wydatki", "Kultura i rozrywka", "Jedzenie poza domem", "Opłaty mieszkaniowe"
-        ]
-
-        sns.barplot(filtered_data, x="Data", y="Kwota", hue="Kategoria", hue_order=category_order, ax=ax)
+        sns.barplot(filtered_data, x="Data", y="Kwota", ax=ax)
+        ax.bar_label(ax.containers[0], fontsize=8)
         ax.set_title("Wydatki z okresu")
         ax.set_xlabel("Data")
         ax.set_ylabel("Kwota")
-        ax.legend(borderaxespad=1, fontsize=8)
-        ax.tick_params(axis="x", rotation=90)
+        ax.tick_params(axis="x", rotation=80)
         ax.grid(True, which="major", axis="both", linestyle="--", alpha=0.7)
 
         fig.tight_layout()
