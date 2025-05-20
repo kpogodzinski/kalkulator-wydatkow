@@ -12,9 +12,11 @@ from ExpCategory import ExpCategory
 from GUI.EditExpenseWindow import EditExpenseWindow
 from GUI.StatsWindow import StatsWindow
 
+""" TABLICA NAZW MIESIĘCY """
 MONTHS = ["", "styczeń", "luty", "marzec", "kwiecień", "maj", "czerwiec",
                 "lipiec", "sierpień", "wrzesień", "październik", "listopad", "grudzień"]
 
+""" KLASA GŁÓWNEGO OKNA APLIKACJI """
 class MainWindow(tk.Tk):
     def __init__(self):
         super().__init__()
@@ -27,15 +29,14 @@ class MainWindow(tk.Tk):
         self.resizable(width=False, height=False)
 
         """ RAMKA Z DANYMI """
-        self.sort_state: dict[Optional[str], Optional[str]] \
-            = {"column": None, "direction": None}
-        expenses_frame = tk.LabelFrame(self, borderwidth=0)
-        expenses_frame.pack(fill="both", padx=10, pady=10)
-        ttk.Label(expenses_frame, text="Lista wydatków", font="24").pack(padx=10, pady=5)
+        self.sort_state: dict[Optional[str], Optional[str]] = {"column": None, "direction": None}
+        self.expenses_frame = tk.Frame(self)
+        self.expenses_frame.pack(fill="both", padx=10, pady=10)
+        ttk.Label(self.expenses_frame, text="Lista wydatków", font="24").pack(padx=10, pady=5)
         self.reload_file()
 
         """ TABELKA Z WYDATKAMI """
-        self.tree = ttk.Treeview(expenses_frame, selectmode="browse")
+        self.tree = ttk.Treeview(self.expenses_frame, selectmode="browse")
         self.tree["columns"] = list(self.file.columns)
         self.tree["show"] = "headings"
         widths = (100, 100, 150, 250)
@@ -45,43 +46,44 @@ class MainWindow(tk.Tk):
             self.tree.column(col, width=width)
 
         """ SCROLLBAR DO TABELKI """
-        scroll = ttk.Scrollbar(expenses_frame, orient="vertical", command=self.tree.yview)
+        scroll = ttk.Scrollbar(self.expenses_frame, orient="vertical", command=self.tree.yview)
         scroll.pack(side="right", fill="y")
         self.tree.configure(yscrollcommand=scroll.set)
         self.refresh_tree()
 
-        """ PRZYCISKI DO TWORZENIA/EDYCJI WYDATKU """
-        new_exp_btn = ttk.Button(expenses_frame, text="Nowy wydatek", command=self.new_expense)
+        """ PRZYCISKI DO ZARZĄDZANIA WYDATKAMI ORAZ DO OTWARCIA STATYSTYK """
+        new_exp_btn = ttk.Button(self.expenses_frame, text="Nowy wydatek", command=self.new_expense)
         new_exp_btn.pack(side="left", padx=10, pady=5)
 
-        modify_exp_btn = ttk.Button(expenses_frame, text="Edytuj wydatek", command=self.edit_expense)
+        modify_exp_btn = ttk.Button(self.expenses_frame, text="Edytuj wydatek", command=self.edit_expense)
         modify_exp_btn.pack(side="left", padx=10, pady=5)
 
-        delete_exp_btn = ttk.Button(expenses_frame, text="Usuń wydatek", command=self.delete_expense)
+        delete_exp_btn = ttk.Button(self.expenses_frame, text="Usuń wydatek", command=self.delete_expense)
         delete_exp_btn.pack(side="left", padx=10, pady=5)
 
-        stats_btn = ttk.Button(expenses_frame, text="Statystyki", command=self.open_stats)
+        stats_btn = ttk.Button(self.expenses_frame, text="Statystyki", command=self.open_stats)
         stats_btn.pack(side="right", padx=10, pady=5)
 
         """ RAMKA Z FILTRAMI """
-        filters_frame = tk.LabelFrame(self, borderwidth=0)
-        filters_frame.pack(fill="both", padx=10, pady=10)
-        ttk.Label(filters_frame, text="Filtry", font="24").pack(anchor='w', padx=10, pady=5)
+        self.filters_frame = tk.Frame(self)
+        self.filters_frame.pack(fill="both", padx=10, pady=10)
+        ttk.Label(self.filters_frame, text="Filtry", font="24").pack(anchor='w', padx=10, pady=5)
 
         """ FILTR WG KATEGORII """
-        cat_frame = tk.Frame(filters_frame)
-        ttk.Label(cat_frame, text="Kategoria:")
-        self.category = ttk.Combobox(cat_frame, values=[cat.value for cat in ExpCategory])
+        self.cat_frame = tk.Frame(self.filters_frame)
+        ttk.Label(self.cat_frame, text="Kategoria:")
+        self.category = ttk.Combobox(self.cat_frame, values=[cat.value for cat in ExpCategory])
 
-        for child in cat_frame.winfo_children():
+        for child in self.cat_frame.winfo_children():
             child.pack(side="left", padx=5, pady=5)
 
-        cat_frame.pack(anchor="w")
+        self.cat_frame.pack(anchor="w")
 
         """ FILTR WG ROKU/MIESIĄCA/DNIA """
         self.date_type = tk.StringVar()
-        self.date_frame = tk.Frame(filters_frame)
-        default_radio = ttk.Radiobutton(self.date_frame, text="Data", value="date", variable=self.date_type, command=self.radio_select)
+        self.date_frame = tk.Frame(self.filters_frame)
+        default_radio = ttk.Radiobutton(self.date_frame, text="Data", value="date",
+                                        variable=self.date_type, command=self.radio_select)
 
         ttk.Label(self.date_frame, text="Rok:")
         self.__year_var = tk.StringVar()
@@ -105,8 +107,9 @@ class MainWindow(tk.Tk):
         self.date_frame.pack(anchor="w")
 
         """ FILTR WG ZAKRESU DAT """
-        self.range_frame = tk.Frame(filters_frame)
-        ttk.Radiobutton(self.range_frame, text="Zakres dat", value="range", variable=self.date_type, command=self.radio_select)
+        self.range_frame = tk.Frame(self.filters_frame)
+        ttk.Radiobutton(self.range_frame, text="Zakres dat", value="range",
+                        variable=self.date_type, command=self.radio_select)
 
         ttk.Label(self.range_frame, text="Data od:")
         self.date_from = DateEntry(self.range_frame, date_pattern="YYYY-MM-dd", firstweekday="monday")
@@ -125,7 +128,7 @@ class MainWindow(tk.Tk):
         self.range_frame.pack(anchor="w")
 
         """ PRZYCISKI DO FILTROWANIA """
-        search_btn = ttk.Button(filters_frame, text="Szukaj",
+        search_btn = ttk.Button(self.filters_frame, text="Szukaj",
                                 command=lambda: self.search(date_from=self.date_from.get(),
                                                             date_to=self.date_to.get(),
                                                             category=self.category.get(),
@@ -133,15 +136,17 @@ class MainWindow(tk.Tk):
                                                             month = self.month.get(),
                                                             day=self.day.get()))
         search_btn.pack(side="left", padx=5, pady=5)
-        clear_btn = ttk.Button(filters_frame, text="Wyczyść filtry", command=self.clear_filters)
+        clear_btn = ttk.Button(self.filters_frame, text="Wyczyść filtry", command=self.clear_filters)
         clear_btn.pack(side="left", padx=5, pady=5)
 
         default_radio.invoke()
         self.mainloop()
 
+    """ METODA DO DODAWANIA WYDATKU """
     def new_expense(self):
         EditExpenseWindow(master=self, on_close=self.on_edit_close)
 
+    """ METODA DO EDYCJI WYDATKU """
     def edit_expense(self):
         try:
             expense = self.get_expense_from_tree()
@@ -149,6 +154,7 @@ class MainWindow(tk.Tk):
         except IndexError as e:
             print(e)
 
+    """ METODA DO USUWANIA WYDATKU """
     def delete_expense(self):
         confirmed = mb.askquestion(title="Potwierdzenie", message="Czy na pewno chcesz usunąć wskazany wydatek?")
         if confirmed == "no":
@@ -165,13 +171,16 @@ class MainWindow(tk.Tk):
 
         self.on_edit_close()
 
+    """ METODA OTWIERAJĄCA OKNO ZE STATYSTYKAMI """
     def open_stats(self):
         StatsWindow(master=self)
+
 
     def on_edit_close(self):
         self.reload_file()
         self.refresh_tree()
 
+    """ METODA ŁADUJĄCA DANE Z PLIKU CSV """
     def reload_file(self):
         self.file = pd.read_csv("expenses.csv", sep=";")
         self.file["Data"] = pd.to_datetime(self.file["Data"])
@@ -182,6 +191,7 @@ class MainWindow(tk.Tk):
         else:
             self.file.sort_values(by=["Data"], ascending=False, inplace=True)
 
+    """ METODA ODŚWIEŻAJĄCA DANE W TABELI """
     def refresh_tree(self):
         self.tree.delete(*self.tree.get_children())
         for _, row in self.file.iterrows():
@@ -191,6 +201,7 @@ class MainWindow(tk.Tk):
             self.tree.insert("", tk.END, values=values)
         self.tree.pack(fill="both", padx=10, pady=10)
 
+    """ METODA SORTUJĄCA DANE W TABELI WG KOLUMNY """
     def sort_by_column(self, col):
         current = self.sort_state
 
@@ -221,12 +232,14 @@ class MainWindow(tk.Tk):
                 label += f" {arrow}"
             self.tree.heading(heading, text=label, command=lambda _col=heading: self.sort_by_column(_col))
 
+    """ METODA ZWRACAJĄCA OBIEKT EXPENSE Z ZAZNACZONEGO WIERSZA W TABELI """
     def get_expense_from_tree(self):
         selected = self.tree.focus()
         entry = self.tree.item(selected)["values"]
         expense = Expense(date=entry[0], amount=entry[1], category=ExpCategory(entry[2]).name, notes=entry[3])
         return expense
 
+    """ METODA WYSZUKUJĄCA WYDATKI SPEŁNIAJĄCE USTAWIONE FILTRY """
     def search(self, date_from=None, date_to=None, category=None, year=None, month=None, day=None):
         self.reload_file()
 
@@ -252,15 +265,18 @@ class MainWindow(tk.Tk):
             self.file = self.file[self.file["Kategoria"] == ExpCategory(category).name]
         self.refresh_tree()
 
+    """ METODA CZYSZCZĄCA POLA W FILTRACH PO DACIE """
     def clear_day(self):
         self.day.delete(0, "end")
         self.month.delete(0, "end")
         self.year.delete(0, "end")
 
+    """ METODA CZYSZCZĄCA POLA W FILTRACH PO ZAKRESIE DAT """
     def clear_range(self):
         self.date_from.delete(0, "end")
         self.date_to.delete(0, "end")
 
+    """ METODA CZYSZCZĄCA WSZYSTKIE FILTRY """
     def clear_filters(self):
         self.reload_file()
         self.clear_day()
@@ -268,6 +284,7 @@ class MainWindow(tk.Tk):
         self.category.delete(0, "end")
         self.refresh_tree()
 
+    """ METODA ZWRACAJĄCA LISTĘ LAT ZNAJDUJĄCYCH SIĘ W DANYCH """
     def get_years(self):
         years = set()
         for child in self.tree.get_children():
@@ -276,9 +293,11 @@ class MainWindow(tk.Tk):
             years.add(date_split[0])
         return list(years)
 
+    """ METODA ZWRACAJĄCA LISTĘ NAZW MIESIĘCY """
     def get_months(self):
         return MONTHS[1:]
 
+    """ METODA ZWRACAJĄCA LISTĘ DNI MIESIĄCA W ZALEŻNOŚCI OD MIESIĄCA I ROKU """
     def get_days(self):
         try:
             days = calendar.monthrange(int(self.year.get()), MONTHS.index(self.month.get()))
@@ -287,9 +306,11 @@ class MainWindow(tk.Tk):
             return [str(i) for i in range(1, 32)]
         return [str(i) for i in range(1, days[1]+1)]
 
+    """ METODA AKTUALIZUJĄCA LISTĘ DNI MIESIĄCA W COMBOBOXIE PO WYBRANIU ROKU LUB MIESIĄCA """
     def update_days(self, *args):
         self.day["values"] = self.get_days()
 
+    """ METODA OBSŁUGUJĄCA ZMIANĘ WYBORU RADIOBUTTONA """
     def radio_select(self):
         if self.date_type.get() == "date":
             for child in self.date_frame.winfo_children():

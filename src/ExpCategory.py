@@ -1,5 +1,6 @@
 from enum import Enum
 
+""" ENUMERATOR DLA SKRÓCONYCH NAZW KATEGORII """
 class ExpCategory(Enum):
     TRANSPORT = "Transport"
     ENTERTAINMENT = "Kultura i rozrywka"

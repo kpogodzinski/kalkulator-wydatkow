@@ -1,6 +1,7 @@
 import datetime
 import ExpCategory
 
+""" KLASA REPREZENTUJĄCA OBIEKT WYDATKU """
 class Expense:
     def __init__(self,
                 date: datetime.date,
