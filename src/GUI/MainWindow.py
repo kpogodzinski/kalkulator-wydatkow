@@ -146,13 +146,17 @@ class MainWindow(tk.Tk):
 
     """ METODA DO OTWARCIA OKNA DODAWANIA WYDATKU """
     def new_expense(self) -> None:
-        EditExpenseWindow(master=self, on_close=self.on_edit_close)
+        child = EditExpenseWindow(master=self, on_close=self.on_edit_close)
+        child.grab_set()
+        self.wait_window(child)
 
     """ METODA DO OTWARCIA OKNA EDYCJI WYDATKU """
     def edit_expense(self) -> None:
         try:
             expense = self.get_expense_from_tree()
-            EditExpenseWindow(master=self, on_close=self.on_edit_close, expense=expense)
+            child = EditExpenseWindow(master=self, on_close=self.on_edit_close, expense=expense)
+            child.grab_set()
+            self.wait_window(child)
         except IndexError as e:
             print(f"ERROR -- edit_expense: {e}")
 
@@ -171,7 +175,9 @@ class MainWindow(tk.Tk):
 
     """ METODA OTWIERAJĄCA OKNO ZE STATYSTYKAMI """
     def open_stats(self) -> None:
-        StatsWindow(master=self)
+        child = StatsWindow(master=self)
+        child.grab_set()
+        self.wait_window(child)
 
     """ METODA WYWOŁYWANA PO ZAMKNIĘCIU OKNA DODAWANIA/EDYCJI """
     def on_edit_close(self) -> None:

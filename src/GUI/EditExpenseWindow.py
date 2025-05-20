@@ -19,7 +19,7 @@ class EditExpenseWindow(tk.Toplevel):
             self.title("Nowy wydatek")
         else:
             self.title("Edytuj wydatek")
-        self.geometry("300x400")
+        self.geometry("300x300")
         self.resizable(False, False)
 
         """ RAMKA-KONTENER DLA ELEMENTÓW """
@@ -27,16 +27,16 @@ class EditExpenseWindow(tk.Toplevel):
 
         """ ETYKIETY I POLA DO WYPEŁNIENIA SZCZEGÓŁÓW WYDATKU """
         ttk.Label(self.container, text="Data:")
-        self.date = DateEntry(self.container, date_pattern="YYYY-MM-dd", firstweekday="monday")
+        self.date = DateEntry(self.container, date_pattern="YYYY-MM-dd", firstweekday="monday", width=10)
 
         ttk.Label(self.container, text="Kwota:")
-        self.amount = ttk.Entry(self.container)
+        self.amount = ttk.Entry(self.container, width=10)
 
         ttk.Label(self.container, text="Kategoria:")
-        self.category = ttk.Combobox(self.container, values=[cat.value for cat in ExpCategory])
+        self.category = ttk.Combobox(self.container, values=[cat.value for cat in ExpCategory], width=20)
 
         ttk.Label(self.container, text="Uwagi:")
-        self.notes = ttk.Entry(self.container)
+        self.notes = ttk.Entry(self.container, width=50)
 
         """ WYPEŁNIENIE PÓL W PRZYPADKU EDYTOWANIA ISTNIEJĄCEGO WYDATKU """
         if expense:
