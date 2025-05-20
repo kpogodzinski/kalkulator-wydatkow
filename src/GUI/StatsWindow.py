@@ -7,6 +7,7 @@ from tkcalendar import DateEntry
 from datetime import datetime
 from collections import Counter
 
+import numpy as np
 import pandas as pd
 import seaborn as sns
 
@@ -14,6 +15,7 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from matplotlib.figure import Figure
 
 from ExpCategory import ExpCategory
+from FileManager import FileManager
 
 """ KLASA OKNA ZE STATYSTYKAMI """
 class StatsWindow(tk.Toplevel):
@@ -30,8 +32,7 @@ class StatsWindow(tk.Toplevel):
         self.stats_frame.pack(side="left", fill="y", padx=10, pady=10)
 
         """ ODCZYT PLIKU """
-        self.file = pd.read_csv("expenses.csv", sep=";")
-        self.file["Data"] = pd.to_datetime(self.file["Data"])
+        self.dataframe = FileManager.read()
 
         """ OBLICZENIE STATYSTYK """
         self.stats = self.compute_stats()
@@ -41,6 +42,7 @@ class StatsWindow(tk.Toplevel):
         ttk.Label(self.stats_frame, text=f"Liczba wydatków: {self.stats["expenses_count"]}")
         ttk.Label(self.stats_frame, text=f"Suma wydatków: {self.stats["expenses_sum"]}")
         ttk.Label(self.stats_frame, text=f"Średnia dzienna: {self.stats["daily_avg"]}")
+        ttk.Label(self.stats_frame, text=f"Najmniejszy wydatek: {self.stats["expense_min"]}")
         ttk.Label(self.stats_frame, text=f"Największy wydatek: {self.stats["expense_max"]}")
         ttk.Label(self.stats_frame, text=f"Najczęstsza kategoria: {ExpCategory[most_common_cat]}")
 
@@ -61,6 +63,9 @@ class StatsWindow(tk.Toplevel):
         self.barplot_tab = ttk.Frame(self.tabs_widget)
         self.date_select_frame = ttk.Frame(self.barplot_tab)
         self.tabs_widget.add(self.barplot_tab, text="Wydatki z okresu")
+
+        self.histplot_tab = ttk.Frame(self.tabs_widget)
+        self.tabs_widget.add(self.histplot_tab, text="Wydawane kwoty")
 
         self.tabs_widget.pack(fill="both", padx=5, pady=5)
 
@@ -85,16 +90,20 @@ class StatsWindow(tk.Toplevel):
         self.date_select_frame.pack()
         self.draw_barplot()
 
+        """ HISTOGRAM """
+        self.draw_histplot()
+
     """ METODA OBLICZAJĄCA WYBRANE STATYSTYKI OPISOWE """
     def compute_stats(self) -> Dict[str, Any]:
-        stats = {"expenses_count": self.file["Kwota"].count(),
-                 "expenses_sum": round(self.file["Kwota"].sum(), 2)}
+        stats = {"expenses_count": self.dataframe["Kwota"].count(),
+                 "expenses_sum": round(self.dataframe["Kwota"].sum(), 2)}
 
-        days = (self.file["Data"].max() - self.file["Data"].min()).days + 1
+        days = (self.dataframe["Data"].max() - self.dataframe["Data"].min()).days + 1
         stats["daily_avg"] = round(stats["expenses_sum"] / days, 2)
 
-        stats["expense_max"] = max(self.file["Kwota"])
-        stats["cat_counter"] = Counter(self.file["Kategoria"])
+        stats["expense_min"] = self.dataframe["Kwota"].min()
+        stats["expense_max"] = self.dataframe["Kwota"].max()
+        stats["cat_counter"] = Counter(self.dataframe["Kategoria"])
 
         return stats
 
@@ -107,7 +116,7 @@ class StatsWindow(tk.Toplevel):
                autopct="%1.1f%%",
                shadow=True
                )
-        ax.set_title("Rozkład kategorii")
+        ax.set_title("Procentowy udział kategorii wydatków")
         ax.axis("equal")
 
         fig.tight_layout()
@@ -117,8 +126,8 @@ class StatsWindow(tk.Toplevel):
 
     """ METODA RYSUJĄCA WYKRES SŁUPKOWY """
     def draw_barplot(self) -> None:
-        filtered_data = self.file[(self.file["Data"] >= self.date_from.get()) &
-                                  (self.file["Data"] <= self.date_to.get())].copy()
+        filtered_data = self.dataframe[(self.dataframe["Data"] >= self.date_from.get()) &
+                                       (self.dataframe["Data"] <= self.date_to.get())].copy()
         filtered_data = filtered_data.groupby(["Data"])["Kwota"].sum().reset_index()
 
         fig = Figure(figsize=(6, 5))
@@ -126,7 +135,7 @@ class StatsWindow(tk.Toplevel):
 
         sns.barplot(filtered_data, x="Data", y="Kwota", ax=ax)
         ax.bar_label(ax.containers[0], fontsize=8)
-        ax.set_title("Wydatki z okresu")
+        ax.set_title("Dzienna suma wydatków z zadanego okresu")
         ax.set_xlabel("Data")
         ax.set_ylabel("Kwota")
         ax.tick_params(axis="x", rotation=80)
@@ -144,3 +153,20 @@ class StatsWindow(tk.Toplevel):
                 child.destroy()
                 break
         self.draw_barplot()
+
+    """ METODA RYSUJĄCA HISTOGRAM """
+    def draw_histplot(self) -> None:
+        fig = Figure(figsize=(6, 6))
+        ax = fig.add_subplot(1, 1, 1)
+
+        sns.histplot(self.dataframe["Kwota"], color="green", ax=ax, bins=20, kde=True)
+        max_amount = self.dataframe["Kwota"].max()
+        ax.set_xticks(np.arange(0, max_amount + (50 - max_amount%50 + 1), 50))
+        ax.set_title("Rozkład wydatków wg kwoty")
+        ax.set_xlabel("Kwota")
+        ax.set_ylabel("Liczba wydatków")
+
+        fig.tight_layout()
+        canvas = FigureCanvasTkAgg(fig, master=self.histplot_tab)
+        canvas.draw()
+        canvas.get_tk_widget().pack(fill="both", expand=True)
