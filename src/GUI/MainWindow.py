@@ -295,7 +295,7 @@ class MainWindow(tk.Tk):
             date = self.tree.item(child, "values")[0]
             date_split = date.split("-")
             years.add(date_split[0])
-        return list(years)
+        return sorted(list(years))
 
     """ METODA ZWRACAJĄCA LISTĘ NAZW MIESIĘCY """
     def get_months(self) -> List[str]:

@@ -64,6 +64,7 @@ class EditExpenseWindow(tk.Toplevel):
 
     """ METODA ZAPISUJĄCA WYDATEK """
     def save_expense(self, date, amount, category, notes) -> None:
+        amount = amount.replace(",", ".")
         new_expense = Expense(date=date, amount=amount, category=ExpCategory(category).name, notes=notes)
 
         if self.expense is None:
