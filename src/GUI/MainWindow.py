@@ -1,12 +1,14 @@
 import calendar
 import tkinter as tk
-import pandas as pd
 
-from typing import Optional
+from typing import Optional, List
 from tkinter import ttk
 from tkinter import messagebox as mb
+
+from pandas import DataFrame
 from tkcalendar import DateEntry
 
+from FileManager import FileManager
 from Models.Expense import Expense
 from ExpCategory import ExpCategory
 from GUI.EditExpenseWindow import EditExpenseWindow
@@ -22,26 +24,26 @@ class MainWindow(tk.Tk):
         super().__init__()
 
         """ USTAWIENIA OKNA """
-        self.file = pd.read_csv("expenses.csv", sep=";")
-        self.file["Data"] = pd.to_datetime(self.file["Data"])
         self.title("Kalkulator wydatków")
         self.geometry("700x600")
         self.resizable(width=False, height=False)
 
         """ RAMKA Z DANYMI """
-        self.sort_state: dict[Optional[str], Optional[str]] = {"column": None, "direction": None}
         self.expenses_frame = tk.Frame(self)
         self.expenses_frame.pack(fill="both", padx=10, pady=10)
         ttk.Label(self.expenses_frame, text="Lista wydatków", font="24").pack(padx=10, pady=5)
+
+        self.dataframe: Optional[DataFrame] = None
+        self.sort_state: dict[Optional[str], Optional[str]] = {"column": None, "direction": None}
         self.reload_file()
 
         """ TABELKA Z WYDATKAMI """
         self.tree = ttk.Treeview(self.expenses_frame, selectmode="browse")
-        self.tree["columns"] = list(self.file.columns)
+        self.tree["columns"] = list(self.dataframe.columns)
         self.tree["show"] = "headings"
         widths = (100, 100, 150, 250)
 
-        for col, width in zip(self.file.columns, widths):
+        for col, width in zip(self.dataframe.columns, widths):
             self.tree.heading(col, text=col, command=lambda _col=col: self.sort_by_column(_col))
             self.tree.column(col, width=width)
 
@@ -142,59 +144,54 @@ class MainWindow(tk.Tk):
         default_radio.invoke()
         self.mainloop()
 
-    """ METODA DO DODAWANIA WYDATKU """
-    def new_expense(self):
+    """ METODA DO OTWARCIA OKNA DODAWANIA WYDATKU """
+    def new_expense(self) -> None:
         EditExpenseWindow(master=self, on_close=self.on_edit_close)
 
-    """ METODA DO EDYCJI WYDATKU """
-    def edit_expense(self):
+    """ METODA DO OTWARCIA OKNA EDYCJI WYDATKU """
+    def edit_expense(self) -> None:
         try:
             expense = self.get_expense_from_tree()
             EditExpenseWindow(master=self, on_close=self.on_edit_close, expense=expense)
         except IndexError as e:
-            print(e)
+            print(f"ERROR -- edit_expense: {e}")
 
     """ METODA DO USUWANIA WYDATKU """
-    def delete_expense(self):
-        confirmed = mb.askquestion(title="Potwierdzenie", message="Czy na pewno chcesz usunąć wskazany wydatek?")
-        if confirmed == "no":
-            return
-
-        expense = self.get_expense_from_tree()
-        with open("expenses.csv", "r") as file:
-            lines = file.readlines()
-
-        with open("expenses.csv", "w") as file:
-            for line in lines:
-                if line != str(expense):
-                    file.write(line)
-
-        self.on_edit_close()
+    def delete_expense(self) -> None:
+        try:
+            expense = self.get_expense_from_tree()
+            confirmed = mb.askquestion(title="Potwierdzenie", message="Czy na pewno chcesz usunąć wskazany wydatek?")
+            if confirmed == "no":
+                return
+            FileManager.delete(str(expense))
+            self.reload_file()
+            self.refresh_tree()
+        except IndexError as e:
+            print(f"ERROR -- delete_expense: {e}")
 
     """ METODA OTWIERAJĄCA OKNO ZE STATYSTYKAMI """
-    def open_stats(self):
+    def open_stats(self) -> None:
         StatsWindow(master=self)
 
-
-    def on_edit_close(self):
+    """ METODA WYWOŁYWANA PO ZAMKNIĘCIU OKNA DODAWANIA/EDYCJI """
+    def on_edit_close(self) -> None:
         self.reload_file()
         self.refresh_tree()
 
-    """ METODA ŁADUJĄCA DANE Z PLIKU CSV """
-    def reload_file(self):
-        self.file = pd.read_csv("expenses.csv", sep=";")
-        self.file["Data"] = pd.to_datetime(self.file["Data"])
+    """ METODA ŁADUJĄCA DANE Z PLIKU """
+    def reload_file(self) -> None:
+        self.dataframe = FileManager.read()
 
         if self.sort_state["column"] and self.sort_state["direction"]:
             ascending = self.sort_state["direction"] == "asc"
-            self.file.sort_values(by=self.sort_state["column"], ascending=ascending, inplace=True)
+            self.dataframe.sort_values(by=self.sort_state["column"], ascending=ascending, inplace=True)
         else:
-            self.file.sort_values(by=["Data"], ascending=False, inplace=True)
+            self.dataframe.sort_values(by=["Data"], ascending=False, inplace=True)
 
     """ METODA ODŚWIEŻAJĄCA DANE W TABELI """
-    def refresh_tree(self):
+    def refresh_tree(self) -> None:
         self.tree.delete(*self.tree.get_children())
-        for _, row in self.file.iterrows():
+        for _, row in self.dataframe.iterrows():
             values = list(row)
             values[0] = values[0].strftime("%Y-%m-%d")
             values[2] = str(ExpCategory[values[2]])
@@ -202,7 +199,7 @@ class MainWindow(tk.Tk):
         self.tree.pack(fill="both", padx=10, pady=10)
 
     """ METODA SORTUJĄCA DANE W TABELI WG KOLUMNY """
-    def sort_by_column(self, col):
+    def sort_by_column(self, col) -> None:
         current = self.sort_state
 
         if current["column"] == col:
@@ -221,7 +218,7 @@ class MainWindow(tk.Tk):
             self.reload_file()
         else:
             ascending = current["direction"] == "asc"
-            self.file.sort_values(by=col, ascending=ascending, inplace=True)
+            self.dataframe.sort_values(by=col, ascending=ascending, inplace=True)
 
         self.refresh_tree()
 
@@ -233,14 +230,15 @@ class MainWindow(tk.Tk):
             self.tree.heading(heading, text=label, command=lambda _col=heading: self.sort_by_column(_col))
 
     """ METODA ZWRACAJĄCA OBIEKT EXPENSE Z ZAZNACZONEGO WIERSZA W TABELI """
-    def get_expense_from_tree(self):
+    def get_expense_from_tree(self) -> Expense:
         selected = self.tree.focus()
         entry = self.tree.item(selected)["values"]
         expense = Expense(date=entry[0], amount=entry[1], category=ExpCategory(entry[2]).name, notes=entry[3])
         return expense
 
     """ METODA WYSZUKUJĄCA WYDATKI SPEŁNIAJĄCE USTAWIONE FILTRY """
-    def search(self, date_from=None, date_to=None, category=None, year=None, month=None, day=None):
+    def search(self, date_from=None, date_to=None,
+               category=None, year=None, month=None, day=None) -> None:
         self.reload_file()
 
         if year != "":
@@ -249,35 +247,35 @@ class MainWindow(tk.Tk):
                 month = str(m) if m > 9 else f"0{m}"
                 if day != "":
                     day = day if int(day) > 9 else f"0{day}"
-                    self.file = self.file[(self.file["Data"].dt.year == int(year)) &
-                                          (self.file["Data"].dt.month == int(month)) &
-                                          (self.file["Data"].dt.day == int(day))]
+                    self.dataframe = self.dataframe[(self.dataframe["Data"].dt.year == int(year)) &
+                                                    (self.dataframe["Data"].dt.month == int(month)) &
+                                                    (self.dataframe["Data"].dt.day == int(day))]
                 else:
-                    self.file = self.file[(self.file["Data"].dt.year == int(year)) &
-                                          (self.file["Data"].dt.month == int(month))]
+                    self.dataframe = self.dataframe[(self.dataframe["Data"].dt.year == int(year)) &
+                                                    (self.dataframe["Data"].dt.month == int(month))]
             else:
-                self.file = self.file[self.file["Data"].dt.year == int(year)]
+                self.dataframe = self.dataframe[self.dataframe["Data"].dt.year == int(year)]
 
         if date_from != "" and date_to != "":
-            self.file = self.file[(self.file["Data"] >= date_from) & (self.file["Data"] <= date_to)]
+            self.dataframe = self.dataframe[(self.dataframe["Data"] >= date_from) & (self.dataframe["Data"] <= date_to)]
 
         if category != "":
-            self.file = self.file[self.file["Kategoria"] == ExpCategory(category).name]
+            self.dataframe = self.dataframe[self.dataframe["Kategoria"] == ExpCategory(category).name]
         self.refresh_tree()
 
     """ METODA CZYSZCZĄCA POLA W FILTRACH PO DACIE """
-    def clear_day(self):
+    def clear_day(self) -> None:
         self.day.delete(0, "end")
         self.month.delete(0, "end")
         self.year.delete(0, "end")
 
     """ METODA CZYSZCZĄCA POLA W FILTRACH PO ZAKRESIE DAT """
-    def clear_range(self):
+    def clear_range(self) -> None:
         self.date_from.delete(0, "end")
         self.date_to.delete(0, "end")
 
     """ METODA CZYSZCZĄCA WSZYSTKIE FILTRY """
-    def clear_filters(self):
+    def clear_filters(self) -> None:
         self.reload_file()
         self.clear_day()
         self.clear_range()
@@ -285,7 +283,7 @@ class MainWindow(tk.Tk):
         self.refresh_tree()
 
     """ METODA ZWRACAJĄCA LISTĘ LAT ZNAJDUJĄCYCH SIĘ W DANYCH """
-    def get_years(self):
+    def get_years(self) -> List[str]:
         years = set()
         for child in self.tree.get_children():
             date = self.tree.item(child, "values")[0]
@@ -294,24 +292,24 @@ class MainWindow(tk.Tk):
         return list(years)
 
     """ METODA ZWRACAJĄCA LISTĘ NAZW MIESIĘCY """
-    def get_months(self):
+    def get_months(self) -> List[str]:
         return MONTHS[1:]
 
     """ METODA ZWRACAJĄCA LISTĘ DNI MIESIĄCA W ZALEŻNOŚCI OD MIESIĄCA I ROKU """
-    def get_days(self):
+    def get_days(self) -> List[str]:
         try:
             days = calendar.monthrange(int(self.year.get()), MONTHS.index(self.month.get()))
         except ValueError as e:
-            print(e)
+            print(f"ERROR -- get_days: {e}; Returning default range: [1;31]")
             return [str(i) for i in range(1, 32)]
         return [str(i) for i in range(1, days[1]+1)]
 
     """ METODA AKTUALIZUJĄCA LISTĘ DNI MIESIĄCA W COMBOBOXIE PO WYBRANIU ROKU LUB MIESIĄCA """
-    def update_days(self, *args):
+    def update_days(self, *args) -> None:
         self.day["values"] = self.get_days()
 
     """ METODA OBSŁUGUJĄCA ZMIANĘ WYBORU RADIOBUTTONA """
-    def radio_select(self):
+    def radio_select(self) -> None:
         if self.date_type.get() == "date":
             for child in self.date_frame.winfo_children():
                 child["state"] = tk.ACTIVE

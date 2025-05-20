@@ -1,7 +1,8 @@
-import tkinter
 import tkinter as tk
 
 from tkinter import ttk
+from typing import Dict, Any
+
 from tkcalendar import DateEntry
 from datetime import datetime
 from collections import Counter
@@ -85,7 +86,7 @@ class StatsWindow(tk.Toplevel):
         self.draw_barplot()
 
     """ METODA OBLICZAJĄCA WYBRANE STATYSTYKI OPISOWE """
-    def compute_stats(self):
+    def compute_stats(self) -> Dict[str, Any]:
         stats = {"expenses_count": self.file["Kwota"].count(),
                  "expenses_sum": round(self.file["Kwota"].sum(), 2)}
 
@@ -98,7 +99,7 @@ class StatsWindow(tk.Toplevel):
         return stats
 
     """ METODA RYSUJĄCA WYKRES KOŁOWY """
-    def draw_piechart(self):
+    def draw_piechart(self) -> None:
         fig = Figure(figsize=(6, 6))
         ax = fig.add_subplot(1, 1, 1)
         ax.pie(self.stats["cat_counter"].values(),
@@ -115,7 +116,7 @@ class StatsWindow(tk.Toplevel):
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
     """ METODA RYSUJĄCA WYKRES SŁUPKOWY """
-    def draw_barplot(self):
+    def draw_barplot(self) -> None:
         filtered_data = self.file[(self.file["Data"] >= self.date_from.get()) &
                                   (self.file["Data"] <= self.date_to.get())].copy()
         filtered_data = filtered_data.groupby(["Data"])["Kwota"].sum().reset_index()
@@ -137,9 +138,9 @@ class StatsWindow(tk.Toplevel):
         canvas.get_tk_widget().pack(fill="both", expand=True)
 
     """ METODA AKTUALIZUJĄCA WYKRES SŁUPKOWY PO ZMIANIE ZAKRESU DAT """
-    def on_date_change(self, event):
+    def on_date_change(self, event) -> None:
         for child in self.barplot_tab.winfo_children():
-            if isinstance(child, tkinter.Canvas):
+            if isinstance(child, tk.Canvas):
                 child.destroy()
                 break
         self.draw_barplot()

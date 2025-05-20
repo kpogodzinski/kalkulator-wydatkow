@@ -4,6 +4,7 @@ from tkinter import ttk
 from tkcalendar import DateEntry
 
 from ExpCategory import ExpCategory
+from FileManager import FileManager
 from Models.Expense import Expense
 
 """ KLASA OKIENKA EDYCJI WYDATKU """
@@ -62,30 +63,13 @@ class EditExpenseWindow(tk.Toplevel):
         self.container.pack(fill='x', padx=10, pady=10)
 
     """ METODA ZAPISUJĄCA WYDATEK """
-    def save_expense(self, date, amount, category, notes):
+    def save_expense(self, date, amount, category, notes) -> None:
         new_expense = Expense(date=date, amount=amount, category=ExpCategory(category).name, notes=notes)
+
         if self.expense is None:
-            self.__append_to_file__(new_expense)
+            FileManager.append(str(new_expense))
         else:
-            self.__modify_entry_in_file__(new_expense)
+            FileManager.modify(original=str(self.expense), modified=str(new_expense))
 
         self.on_close()
         self.destroy()
-
-    """ METODA DOPISUJĄCA WPIS NA KOŃCU PLIKU """
-    def __append_to_file__(self, expense):
-        file = open("expenses.csv", "a")
-        file.write(str(expense))
-        file.close()
-
-    """ METODA MODYFIKUJĄCA ISTNIEJĄCY WPIS W PLIKU """
-    def __modify_entry_in_file__(self, expense):
-        with open("expenses.csv", "r") as file:
-            lines = file.readlines()
-
-        with open("expenses.csv", "w") as file:
-            for line in lines:
-                if line == str(self.expense):
-                    file.write(str(expense))
-                else:
-                    file.write(line)
