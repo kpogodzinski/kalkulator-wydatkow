@@ -200,6 +200,7 @@ class MainWindow(tk.Tk):
         for _, row in self.dataframe.iterrows():
             values = list(row)
             values[0] = values[0].strftime("%Y-%m-%d")
+            values[1] = f"{values[1]:.2f} zł"
             values[2] = str(ExpCategory[values[2]])
             self.tree.insert("", tk.END, values=values)
         self.tree.pack(fill="both", padx=10, pady=10)
@@ -239,7 +240,7 @@ class MainWindow(tk.Tk):
     def get_expense_from_tree(self) -> Expense:
         selected = self.tree.focus()
         entry = self.tree.item(selected)["values"]
-        expense = Expense(date=entry[0], amount=entry[1], category=ExpCategory(entry[2]).name, notes=entry[3])
+        expense = Expense(date=entry[0], amount=entry[1].split()[0], category=ExpCategory(entry[2]).name, notes=entry[3])
         return expense
 
     """ METODA WYSZUKUJĄCA WYDATKI SPEŁNIAJĄCE USTAWIONE FILTRY """

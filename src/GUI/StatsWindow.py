@@ -40,10 +40,10 @@ class StatsWindow(tk.Toplevel):
 
         """ ETYKIETY ZE STATYSTYKAMI """
         ttk.Label(self.stats_frame, text=f"Liczba wydatków: {self.stats["expenses_count"]}")
-        ttk.Label(self.stats_frame, text=f"Suma wydatków: {self.stats["expenses_sum"]}")
-        ttk.Label(self.stats_frame, text=f"Średnia dzienna: {self.stats["daily_avg"]}")
-        ttk.Label(self.stats_frame, text=f"Najmniejszy wydatek: {self.stats["expense_min"]}")
-        ttk.Label(self.stats_frame, text=f"Największy wydatek: {self.stats["expense_max"]}")
+        ttk.Label(self.stats_frame, text=f"Suma wydatków: {self.stats["expenses_sum"]:.2f} zł")
+        ttk.Label(self.stats_frame, text=f"Średnia dzienna: {self.stats["daily_avg"]:.2f} zł")
+        ttk.Label(self.stats_frame, text=f"Najmniejszy wydatek: {self.stats["expense_min"]:.2f} zł")
+        ttk.Label(self.stats_frame, text=f"Największy wydatek: {self.stats["expense_max"]:.2f} zł")
         ttk.Label(self.stats_frame, text=f"Najczęstsza kategoria: {ExpCategory[most_common_cat]}")
 
         for child in self.stats_frame.winfo_children():

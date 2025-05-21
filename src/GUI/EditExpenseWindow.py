@@ -18,25 +18,38 @@ class EditExpenseWindow(tk.Toplevel):
         if expense is None:
             self.title("Nowy wydatek")
         else:
-            self.title("Edytuj wydatek")
+            self.title("Edycja wydatku")
         self.geometry("300x300")
         self.resizable(False, False)
 
         """ RAMKA-KONTENER DLA ELEMENTÓW """
         self.container = tk.Frame(self)
+        if expense is None:
+            ttk.Label(self.container, text="Nowy wydatek", font="24").pack(padx=10, pady=10)
+        else:
+            ttk.Label(self.container, text="Edycja wydatku", font="24").pack(padx=10, pady=10)
 
         """ ETYKIETY I POLA DO WYPEŁNIENIA SZCZEGÓŁÓW WYDATKU """
-        ttk.Label(self.container, text="Data:")
-        self.date = DateEntry(self.container, date_pattern="YYYY-MM-dd", firstweekday="monday", width=10)
+        self.date_frame = tk.Frame(self.container)
+        ttk.Label(self.date_frame, text="Data:", width=10).pack(side="left", padx=5, pady=5)
+        self.date = DateEntry(self.date_frame, date_pattern="YYYY-MM-dd", firstweekday="monday")
+        self.date.pack(side="left", padx=5, pady=5)
 
-        ttk.Label(self.container, text="Kwota:")
-        self.amount = ttk.Entry(self.container, width=10)
+        self.amount_frame = tk.Frame(self.container)
+        ttk.Label(self.amount_frame, text="Kwota:", width=10).pack(side="left", padx=5, pady=5)
+        self.amount = ttk.Entry(self.amount_frame, width=10)
+        self.amount.pack(side="left", padx=5, pady=5)
+        ttk.Label(self.amount_frame, text="zł").pack(side="left")
 
-        ttk.Label(self.container, text="Kategoria:")
-        self.category = ttk.Combobox(self.container, values=[cat.value for cat in ExpCategory], width=20)
+        self.category_frame = tk.Frame(self.container)
+        ttk.Label(self.category_frame, text="Kategoria:", width=10).pack(side="left", padx=5, pady=5)
+        self.category = ttk.Combobox(self.category_frame, values=[cat.value for cat in ExpCategory])
+        self.category.pack(side="left", padx=5, pady=5)
 
-        ttk.Label(self.container, text="Uwagi:")
-        self.notes = ttk.Entry(self.container, width=50)
+        self.notes_frame = tk.Frame(self.container)
+        ttk.Label(self.notes_frame, text="Uwagi:", width=10).pack(side="left", padx=5, pady=5)
+        self.notes = ttk.Entry(self.notes_frame, width=50)
+        self.notes.pack(side="left", padx=5, pady=5)
 
         """ WYPEŁNIENIE PÓL W PRZYPADKU EDYTOWANIA ISTNIEJĄCEGO WYDATKU """
         if expense:
@@ -46,21 +59,21 @@ class EditExpenseWindow(tk.Toplevel):
             self.notes.insert(0, expense.notes)
 
         """ PRZYCISK DO ZAPISANIA WYDATKU """
-        button = ttk.Button(self.container, default="active",
-                   command=lambda: self.save_expense(self.date.get(), self.amount.get(),
-                                                     self.category.get(), self.notes.get()))
+        self.button = ttk.Button(self.container,
+                                 default="active",
+                                 command=lambda: self.save_expense(self.date.get(), self.amount.get(),
+                                                                   self.category.get(), self.notes.get()))
         if expense is None:
-            button["text"] = "Dodaj"
+            self.button["text"] = "Dodaj"
         else:
-            button["text"] = "Zapisz"
+            self.button["text"] = "Zapisz"
 
         """ ZAPAKOWANIE PRZYGOTOWANYCH ELEMENTÓW DO KONTENERA """
-        for child in self.container.winfo_children():
-            if type(child) == ttk.Button:
-                child.pack(anchor='e', padx=5, pady=5)
-            else:
-                child.pack(anchor='w', padx=5, pady=5)
-        self.container.pack(fill='x', padx=10, pady=10)
+        for child in self.container.winfo_children()[1:]:
+            child.pack(anchor='w', padx=5, pady=5)
+        self.button.pack(side="right", padx=5, pady=5)
+
+        self.container.pack(fill="both", expand=True, padx=10, pady=10)
 
     """ METODA ZAPISUJĄCA WYDATEK """
     def save_expense(self, date, amount, category, notes) -> None:
