@@ -194,7 +194,7 @@ class MainWindow(tk.Tk):
         else:
             self.dataframe.sort_values(by=["Data"], ascending=False, inplace=True)
 
-    """ METODA ODŚWIEŻAJĄCA DANE W TABELI """
+    """ METODA ODŚWIEŻAJĄCA WPISY W TABELI """
     def refresh_tree(self) -> None:
         self.tree.delete(*self.tree.get_children())
         for _, row in self.dataframe.iterrows():

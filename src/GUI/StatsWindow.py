@@ -46,6 +46,7 @@ class StatsWindow(tk.Toplevel):
         ttk.Label(self.stats_frame, text=f"Największy wydatek: {self.stats["expense_max"]:.2f} zł")
         ttk.Label(self.stats_frame, text=f"Najczęstsza kategoria: {ExpCategory[most_common_cat]}")
 
+        """ ZAPAKOWANIE PRZYGOTOWANYCH ETYKIET DO RAMKI """
         for child in self.stats_frame.winfo_children():
             child["font"] = tk.font.Font(size=12)
             child.pack(anchor="w", padx=10, pady=10)

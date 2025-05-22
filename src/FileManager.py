@@ -1,6 +1,8 @@
 import pandas as pd
 
+""" KLASA STATYCZNA DO ZARZĄDZANIA PLIKIEM Z DANYMI """
 class FileManager:
+    """ NAZWA PLIKU Z DANYMI """
     FILENAME: str = "expenses.csv"
 
     """ METODA ODCZYTUJĄCA DANE Z PLIKU I ZWRACAJĄCA DATAFRAME """
